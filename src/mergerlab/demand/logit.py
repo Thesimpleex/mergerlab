@@ -64,7 +64,9 @@ def _markup_multipliers(shares: FloatArray, omega: FloatArray) -> FloatArray:
     """``g = (I - Omega diag(s))^{-1} 1`` so that absolute markups equal ``g / alpha``."""
     n = shares.size
     try:
-        return np.linalg.solve(np.eye(n) - omega * shares[None, :], np.ones(n))
+        return np.asarray(
+            np.linalg.solve(np.eye(n) - omega * shares[None, :], np.ones(n)), dtype=np.float64
+        )
     except np.linalg.LinAlgError as exc:
         raise CalibrationError("singular multi-product markup system") from exc
 

@@ -80,7 +80,7 @@ def pricing_pressure(
     jac = demand.jacobian(p)
     d_pre = pre.matrix * jac.T
     x = (post.matrix - pre.matrix) * jac.T
-    return -np.linalg.solve(d_pre, x @ (p - costs))
+    return np.asarray(-np.linalg.solve(d_pre, x @ (p - costs)), dtype=np.float64)
 
 
 def merger_pass_through(
@@ -110,7 +110,7 @@ def merger_pass_through(
         jac = demand.jacobian(x)
         f_post = demand.quantities(x) + (om_post * jac.T) @ (x - costs)
         out = -np.linalg.solve(om_pre * jac.T, f_post)
-        return out / x if log_prices else out
+        return np.asarray(out / x if log_prices else out, dtype=np.float64)
 
     dh = np.empty((n, n))
     pc = p.astype(complex)
@@ -119,7 +119,7 @@ def merger_pass_through(
         e[k] = 1j * step
         shifted = pc * np.exp(e) if log_prices else pc + e
         dh[:, k] = h(shifted).imag / step
-    return -np.linalg.inv(dh)
+    return np.asarray(-np.linalg.inv(dh), dtype=np.float64)
 
 
 def cost_pressure(
