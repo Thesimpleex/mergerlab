@@ -1,0 +1,81 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "mergerlab"
+dynamic = ["version"]
+description = "Calibrated merger simulation and antitrust screening: from shares, prices and margins to price effects, required synergies and guideline screens."
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [{ name = "Alexander Majores" }]
+keywords = ["merger simulation", "antitrust", "industrial organization", "competition economics", "GUPPI", "logit demand", "bertrand"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Financial and Insurance Industry",
+  "Topic :: Scientific/Engineering",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Typing :: Typed",
+]
+dependencies = [
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "rich>=13.7",
+]
+
+[project.optional-dependencies]
+plot = ["matplotlib>=3.8"]
+oracle = ["pyblp>=1.1"]
+docs = ["matplotlib>=3.8", "playwright>=1.45"]
+dev = ["pytest>=8.0", "ruff>=0.6,<0.17", "mypy>=1.10", "matplotlib>=3.8"]
+
+[project.urls]
+Homepage = "https://github.com/Thesimpleex/mergerlab"
+Issues = "https://github.com/Thesimpleex/mergerlab/issues"
+
+[project.scripts]
+mergerlab = "mergerlab.cli:main"
+
+[tool.hatch.version]
+path = "src/mergerlab/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mergerlab"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src", "tests", "scripts", "examples", "README.md", "LICENSE", "CITATION.cff", "pyproject.toml", "docs/methodology.md", "docs/results.json"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4", "SIM", "NPY", "PT", "RUF"]
+
+[tool.ruff.lint.per-file-ignores]
+"src/mergerlab/report.py" = ["E501"]  # HTML and CSS template strings
+"tests/*" = ["PT018"]  # compound assertions are readable in tests
+
+[tool.ruff.lint.isort]
+known-first-party = ["mergerlab"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = ["slow: long-running statistical tests"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src"]
+
+[[tool.mypy.overrides]]
+module = ["scipy", "scipy.*"]
+ignore_missing_imports = true
