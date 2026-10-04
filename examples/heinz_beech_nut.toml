@@ -1,0 +1,82 @@
+# Illustrative research case: FTC v. H.J. Heinz Co. (D.C. Cir. 2001), proposed acquisition of
+# Beech-Nut by Heinz in the U.S. baby food market.
+#
+# Observed: revenue shares of the three firms (as reported in Koh, 2025, section 6, citing
+# Chen, 2010) and the market size range. Everything else (prices, margins, nesting,
+# elasticities) is an assumption chosen for illustration and varied in the Monte Carlo bands.
+
+[case]
+name = "Heinz / Beech-Nut (illustrative)"
+description = "Proposed three-to-two merger in U.S. baby food: Heinz (17.4%) acquires Beech-Nut (15.4%); Gerber (65%) is the leader."
+currency = "USD"
+period = "per year"
+revenue_unit = "million"
+source = "Revenue shares as reported in Koh (2025, section 6) citing Chen (2010). The lower bound of the $865 million to $1 billion market-size range stated there is used as the annual sales of the three firms (inside revenue)."
+disclaimer = "Illustrative research on public figures and stated assumptions. It is not legal, antitrust or investment advice and does not reproduce the record of the case."
+
+[market]
+share_basis = "revenue"
+revenue = 865.0            # annual sales of the three firms (inside revenue), million USD
+outside_share = 0.022      # other sellers: 1 - 0.978
+outside_price = 1.0        # assumption: same relative price level as the three brands
+
+[[products]]
+name = "Gerber"
+owner = "Gerber"
+price = 1.0                # relative price (assumption)
+share = 0.65
+nest = 0
+
+[[products]]
+name = "Heinz"
+owner = "Heinz"
+price = 1.0
+share = 0.174
+margin = 0.25              # Lerner margin of Heinz (assumption); the other margins follow from the model
+nest = 1
+
+[[products]]
+name = "Beech-Nut"
+owner = "Beech-Nut"
+price = 1.0
+share = 0.154
+nest = 1
+
+[merger]
+parties = ["Heinz", "Beech-Nut"]
+efficiency = 0.0           # no merger-specific cost savings in the base case
+
+[models]
+include = ["logit", "nested_logit", "ces", "linear", "pcaids"]
+
+[models.nested_logit]
+sigma = 0.4                # Heinz and Beech-Nut as closer substitutes than Gerber
+
+[models.linear]
+fill_margins = "logit"     # linear demand needs every margin: Gerber and Beech-Nut from the logit fit
+
+[models.pcaids]
+product = "Heinz"          # own elasticity of Heinz = -1 / margin
+market_elasticity = -1.0
+
+[uncertainty]
+draws = 1000
+seed = 1
+margin_halfwidth = 0.10
+sigma_range = [0.1, 0.7]
+market_elasticity_range = [-1.5, -0.5]
+diversion_concentration = 30.0
+
+[hypothetical_monopolist]
+products = ["Heinz", "Beech-Nut"]
+ssnip = 0.05
+
+[assumptions]
+notes = [
+  "Only the revenue shares and the market size are observed. Prices are normalised to one for all three brands; quantity shares therefore equal revenue shares.",
+  "Only Heinz's Lerner margin (25%) is assumed; the margins of Gerber and Beech-Nut are implied by each demand form (the linear form takes them from the logit fit). The Monte Carlo draws Heinz's margin uniformly within plus or minus 10 percentage points.",
+  "The nesting parameter (0.4, range 0.1 to 0.7) and the PCAIDS market elasticity (-1, range -1.5 to -0.5) are assumptions.",
+  "Linear-demand diversion ratios are proportional to market shares in the base case and Dirichlet-perturbed around that in the Monte Carlo.",
+  "The 865 million USD is treated as the sales of the three firms; the outside good comes on top of it. If 865 were the whole market including the 2.2% of other sellers, all dollar amounts would be 2.2% smaller.",
+  "The outside good (2.2% of revenue, other sellers) is assumed to be priced like the three brands and to be an atomistic fringe in the concentration screens.",
+]
